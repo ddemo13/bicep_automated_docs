@@ -33,8 +33,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm install -g @azure/bicep-cli
+        # Install Azure CLI (includes Bicep)
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        
+        # Install Bicep CLI directly
+        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+        chmod +x ./bicep
+        sudo mv ./bicep /usr/local/bin/bicep
+        
+        # Install Node.js dependencies
         npm install openai
+        
+        # Install system utilities
         sudo apt-get update
         sudo apt-get install -y jq tree
 
@@ -615,8 +625,16 @@ jobs:
         ### Validate Bicep Templates
         
         ```bash
+        # Install Bicep CLI
+        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+        chmod +x ./bicep
+        sudo mv ./bicep /usr/local/bin/bicep
+        
+        # Or install via Azure CLI
+        az bicep install
+        
         # Lint all Bicep files
-        find . -name "*.bicep" -exec az bicep build --file {} \;
+        find . -name "*.bicep" -exec bicep build {} \;
         
         # Validate deployment (what-if)
         az deployment group what-if \
